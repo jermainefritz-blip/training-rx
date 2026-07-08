@@ -49,10 +49,11 @@ export function recommend(ex,dayId,ei,offset){
 
   const hitNow=hitTopThatWeek(ex,dayId,ei,offset);
 
-  if(ex.bw){ // bodyweight: progress by reps, suggest adding a rep target
+  if(ex.bw && !(cur>0)){ // pure bodyweight (no added load): progress by reps
     if(hitNow)return {status:'up',curWeight:cur,note:`All sets at ${ex.topRep} reps`,nextNote:`Aim ${ex.topRep+1}+ reps or add load`,nextWeight:cur};
     return {status:'hold',curWeight:cur,note:`Below ${ex.topRep} reps`,nextWeight:cur};
   }
+  /* weighted bodyweight (added load) falls through to the load-based logic below */
 
   if(ex.type==='strength'){ // compound: need 2 consecutive weeks at top
     const hitPrev=hitTopThatWeek(ex,dayId,ei,offset-1);

@@ -117,6 +117,8 @@ export function buildWorkoutPanel(){
     sp.innerHTML=h;
 
     day.exercises.forEach((ex,ei)=>{
+      const slot=document.createElement('div');
+      slot.className='ex-slot';slot.id=`slot-${di}-${ei}`;
       const card=document.createElement('div');
       card.className='excard';card.id=`ex-${di}-${ei}`;
       card.innerHTML=`
@@ -144,7 +146,8 @@ export function buildWorkoutPanel(){
           <tbody id="tb-${di}-${ei}"></tbody>
         </table>
         <div style="height:10px"></div>`;
-      sp.appendChild(card);
+      slot.appendChild(card);
+      sp.appendChild(slot);
     });
 
     // custom exercise container (re-rendered per week) + add button
@@ -170,14 +173,10 @@ export function renderWorkout(){
     day.exercises.forEach((ex,ei)=>{
       const card=document.getElementById(`ex-${di}-${ei}`);
       const skipped=isSkipped(state.wo,day.id,ei);
-      card.classList.toggle('skipped',skipped);
-      // toggle a "swapped out" note
-      let skipNote=document.getElementById(`skip-${di}-${ei}`);
-      if(skipped&&!skipNote){
-        skipNote=document.createElement('div');skipNote.id=`skip-${di}-${ei}`;skipNote.className='skip-note';
-        skipNote.innerHTML=`Swapped out this week · <button onclick="unskip(${di},${ei})">restore</button>`;
-        card.insertBefore(skipNote,card.firstChild);
-      }else if(!skipped&&skipNote){skipNote.remove();}
+      // true replacement: hide the replaced base card; its custom takes this slot (renderCustom)
+      card.style.display=skipped?'none':'';
+      card.classList.remove('skipped');
+      const oldNote=document.getElementById(`skip-${di}-${ei}`);if(oldNote)oldNote.remove();
 
       // reference pills
       const lastW=workWeight(day.id,ei,state.wo-1);
@@ -209,7 +208,6 @@ export function renderWorkout(){
       }
 
       // set rows
-      const lbsStep=(typeof ex.inc==='number'?ex.inc:5);
       const tb=document.getElementById(`tb-${di}-${ei}`);tb.innerHTML='';
       const saved=store.lifts[wKey(state.wo)]?.[day.id]?.[ei]||{};
       for(let si=0;si<ex.sets;si++){
@@ -221,16 +219,13 @@ export function renderWorkout(){
         const phReps=ex.topRep;
         const tr=document.createElement('tr');
         tr.className='sr'+(s?' done':'');tr.id=`row-${di}-${ei}-${si}`;
-        const lbsId=`lbs-${di}-${ei}-${si}`, repsId=`reps-${di}-${ei}-${si}`;
-        const lbsSpin=isNow?`<span class="spin"><button class="spb" tabindex="-1" onclick="stepVal('${lbsId}',${lbsStep})">+</button><button class="spb" tabindex="-1" onclick="stepVal('${lbsId}',${-lbsStep})">−</button></span>`:'';
-        const repsSpin=isNow?`<span class="spin"><button class="spb" tabindex="-1" onclick="stepVal('${repsId}',1)">+</button><button class="spb" tabindex="-1" onclick="stepVal('${repsId}',-1)">−</button></span>`:'';
         tr.innerHTML=`
           <td>${si+1}</td>
           <td style="font-size:12px;color:var(--muted)">${prev}</td>
-          <td><div class="siwrap"><input class="si" type="number" inputmode="decimal" id="${lbsId}"
-            value="${s&&s.lbs!=null?s.lbs:''}" placeholder="${phLbs}" ${dis}>${lbsSpin}</div></td>
-          <td><div class="siwrap"><input class="si" type="number" inputmode="numeric" id="${repsId}"
-            value="${s?s.reps:''}" placeholder="${phReps}" ${dis}>${repsSpin}</div></td>
+          <td><input class="si" type="number" inputmode="decimal" id="lbs-${di}-${ei}-${si}"
+            value="${s&&s.lbs!=null?s.lbs:''}" placeholder="${phLbs}" ${dis}></td>
+          <td><input class="si" type="number" inputmode="numeric" id="reps-${di}-${ei}-${si}"
+            value="${s?s.reps:''}" placeholder="${phReps}" ${dis}></td>
           <td><button class="dbtn ${s?'on':''}" id="done-${di}-${ei}-${si}" onclick="mark(${di},${ei},${si})" ${dis} aria-label="Mark set done">✓</button></td>`;
         tb.appendChild(tr);
       }
@@ -253,6 +248,8 @@ export function renderCustom(di){
   const addBtn=document.getElementById(`addbtn-${di}`);
   if(addBtn)addBtn.style.display=isNow?'block':'none';
   let total=0,done=0;
+  // clear previously rendered custom cards (slot replacements + bottom extras)
+  document.querySelectorAll(`#day-${di} .excard.custom`).forEach(el=>el.remove());
   cont.innerHTML='';
   list.forEach(cx=>{
     const wk=wKey(state.wo);const saved=store.lifts[wk]?.[day.id]?.['c'+cx.id]||{};
@@ -288,7 +285,10 @@ export function renderCustom(di){
         <tbody>${rows}</tbody>
       </table>
       <div style="height:10px"></div>`;
-    cont.appendChild(card);
+    // a replacement drops into the replaced exercise's slot; extras go to the bottom
+    const rep=(cx.replaces!=null&&cx.replaces!==''&&day.exercises[+cx.replaces]);
+    const slot=rep?document.getElementById(`slot-${di}-${cx.replaces}`):null;
+    (slot||cont).appendChild(card);
   });
   return {total,done};
 }
@@ -354,7 +354,7 @@ export function saveCustomEx(di){
   const topRep=Math.max(1,Math.min(30,parseInt(document.getElementById(`af-reps-${di}`).value)||12));
   const startV=document.getElementById(`af-start-${di}`).value;
   const replaces=document.getElementById(`af-repl-${di}`).value;
-  const restSecs=type==='strength'?120:60;
+  const restSecs=type==='strength'?150:60;
   customAdd(state.wo,day.id,{name,type,sets,topRep,restSecs,start:startV===''?null:+startV,replaces,inc:type==='strength'?5:2.5});
   document.getElementById(`addform-${di}`).classList.remove('open');
   document.getElementById(`addform-${di}`).innerHTML='';

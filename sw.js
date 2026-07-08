@@ -10,7 +10,7 @@
 
    All paths are RELATIVE so this works under any GitHub Pages sub-path.
    ════════════════════════════════════════════════════════════════════ */
-const CACHE_VERSION = 'trx-v8-2026-07-05';   // ← bump on every deploy to ship updates
+const CACHE_VERSION = 'trx-v9-2026-07-05';   // ← bump on every deploy to ship updates
 const CACHE = CACHE_VERSION;
 
 /* The app shell — everything needed to boot with no network. */
