@@ -182,8 +182,11 @@ export function renderWorkout(){
       if(repBtn)repBtn.style.display=(isNow&&!skipped&&lastW!=null)?'block':'none';
       const plateEl=document.getElementById(`plate-${di}-${ei}`);
       if(plateEl){
-        const ps=(ex.bar&&!skipped)?plates(tgt,ex.bar):null;
-        if(ps){plateEl.style.display='block';plateEl.innerHTML=`🏋️ ${tgt} lb = <b>${ps}</b> <span style="opacity:.7">(bar ${ex.bar})</span>`;}
+        const ps=(ex.bar!=null&&!skipped)?plates(tgt,ex.bar):null;
+        if(ps){
+          const barNote=ex.bar>0?` <span style="opacity:.7">(bar ${ex.bar})</span>`:'';
+          plateEl.style.display='block';plateEl.innerHTML=`🏋️ ${tgt} lb = <b>${ps}</b>${barNote}`;
+        }
         else plateEl.style.display='none';
       }
 

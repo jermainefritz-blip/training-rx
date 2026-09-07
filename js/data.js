@@ -7,7 +7,9 @@
 
    type: "strength" = compound (heavier, lower-rep — lifted first)
          "isolation"/"core" = hypertrophy accessory work (lifted after)
-   bar  = barbell weight (lb) for lifts loaded on a bar — the app shows
+   bar  = the fixed weight (lb) already "built in" before plates go on —
+          45 for a standard barbell, 0 for a plate-loaded machine with no
+          bar weight of its own (e.g. leg press). Either way the app shows
           the per-side plate math for these ("X + Y/side").
    ════════════════════════════════════════════════════════════════════ */
 export const DAYS=[
@@ -36,7 +38,7 @@ export const DAYS=[
   {
     id:"legs", label:"Legs", name:"Leg Day", subtitle:"Quads · Hamstrings · Core",
     exercises:[
-      {name:"Leg Press", muscle:"Quads ★", setsReps:"4×4–6", sets:4, topRep:6, restSecs:150, type:"strength", start:190},
+      {name:"Leg Press", muscle:"Quads ★", setsReps:"4×4–6", sets:4, topRep:6, restSecs:150, type:"strength", start:190, bar:0},
       {name:"Romanian Deadlift", muscle:"Hamstrings · glutes ★", setsReps:"3×8–10", sets:3, topRep:10, restSecs:105, type:"strength", start:135, bar:45},
       {name:"Walking Lunge", muscle:"Quads · glutes", setsReps:"3×10–12/leg", sets:3, topRep:12, restSecs:75, type:"isolation", start:30},
       {name:"Leg Extension", muscle:"Quads", setsReps:"3×10–15", sets:3, topRep:15, restSecs:75, type:"isolation", start:115},
