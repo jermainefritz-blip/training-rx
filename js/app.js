@@ -15,12 +15,9 @@ import {
 } from './ui-workout.js';
 import {PROGRAM} from './data.js';
 import {
-  buildDashPanel, pickNutDay, liveCal, saveNut, clearNut,
-  toggleBcForm, saveBody, delBody
+  buildDashPanel, toggleBcForm, saveBody, delBody
 } from './ui-dashboard.js';
-import {buildInsightsPanel} from './ui-insights.js';
-import {importActivity, saveManualActivity, delActivity, toggleActHelp} from './ui-activity.js';
-import {buildTabs, switchTab, switchDay, switchSub, changeWeek, renderAll} from './ui-core.js';
+import {buildTabs, switchTab, switchDay, changeWeek, renderAll} from './ui-core.js';
 import {openModal, closeModal, closeOuter, copySummary, copySaveCode, restoreData, clearData} from './ui-export.js';
 import {setTimer, tToggle, tReset, toggleWorkoutClock, addTime} from './timer.js';
 
@@ -31,15 +28,13 @@ Object.assign(window, {
   // faster logging
   stepVal, repeatLastWeek,
   // navigation
-  changeWeek, switchTab, switchDay, switchSub,
+  changeWeek, switchTab, switchDay,
   // data & backup modal
   openModal, closeModal, closeOuter, copySummary, copySaveCode, restoreData, clearData,
   // workout tab
   toggleHist, mark, markCustom, deleteCustom, openAddForm, saveCustomEx, unskip,
-  // dashboard tab
-  pickNutDay, liveCal, saveNut, clearNut, toggleBcForm, saveBody, delBody,
-  // activity tab
-  importActivity, saveManualActivity, delActivity, toggleActHelp
+  // body tab
+  toggleBcForm, saveBody, delBody
 });
 
 /* ── boot ───────────────────────────────────────────────────────────── */
@@ -48,12 +43,11 @@ async function boot(){
   // live header countdown to the program end date
   const dTo=Math.ceil((new Date(PROGRAM.end+'T23:59:59')-new Date())/86400000);
   const tag=document.getElementById('tagline');
-  if(tag)tag.textContent=dTo>0?`Summer Cut · ${dTo} days to ${PROGRAM.endLabel}`:`Summer Cut · ${PROGRAM.endLabel}`;
+  if(tag)tag.textContent=dTo>0?`Cruise Cut · ${dTo} days to ${PROGRAM.endLabel}`:`Cruise Cut · ${PROGRAM.endLabel}`;
   // build the (empty) shell first so the UI paints immediately
   buildTabs();
   buildWorkoutPanel();
   buildDashPanel();
-  buildInsightsPanel();
   document.getElementById('tbar').classList.toggle('hide',state.activeTab!=='workout');
   // load saved data from IndexedDB / localStorage (async), then render
   await loadAll();

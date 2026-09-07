@@ -27,9 +27,3 @@ export function weekDates(offset){
   const mon=mondayOf(offset);const sun=new Date(mon);sun.setDate(mon.getDate()+6);
   const f=dt=>`${dt.getMonth()+1}/${dt.getDate()}`;return `${f(mon)} – ${f(sun)}`;
 }
-
-/* "Monday, July 6" style label for a given day-of-week within a week. */
-export function dayDateLabel(offset,dowIdx){
-  const mon=mondayOf(offset);const d=new Date(mon);d.setDate(mon.getDate()+dowIdx);
-  return d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
-}
