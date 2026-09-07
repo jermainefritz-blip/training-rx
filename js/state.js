@@ -7,8 +7,6 @@
 export const state = {
   wo: 0,               // week offset (0 = current week, negative = past)
   activeTab: 'workout',// 'workout' | 'dash'
-  activeSub: 'nutrition', // dashboard sub-tab: 'nutrition' | 'body' | 'summary'
   activeDay: 0,        // workout sub-day index (0=Push …)
-  nutDay: 0,           // nutrition day-of-week index being edited
   bcFormOpen: false    // is the body-comp "add measurement" form open?
 };

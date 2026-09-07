@@ -19,7 +19,7 @@ const DB_NAME='trainingRx', DB_STORE='kv', DB_KEY='store';
 
 /* The one source of truth. Mutated in place (never reassigned) so every
    module that imports it keeps seeing the same live object. */
-export const store={lifts:{},nutrition:{},body:[],applied:{},custom:{},skipped:{},activity:{}};
+export const store={lifts:{},body:[],applied:{},custom:{},skipped:{}};
 
 /* Runtime flags other modules read (Data modal, boot warning). */
 export const flags={storageOK:true, lastSaveFailed:false, idbOK:false, migrated:false};
@@ -98,12 +98,10 @@ export function persist(){
 export function replaceStore(p){
   p=p||{};
   store.lifts=p.lifts||{};
-  store.nutrition=p.nutrition||{};
   store.body=p.body||[];
   store.applied=p.applied||{};
   store.custom=p.custom||{};
   store.skipped=p.skipped||{};
-  store.activity=p.activity||{};
 }
 
 /* Load saved data at boot. Prefers IndexedDB, falls back to legacy

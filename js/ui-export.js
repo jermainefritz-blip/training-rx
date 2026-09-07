@@ -3,20 +3,17 @@
    summary, save-code export/restore, and clear-all.
    STEP 1 NOTE: save-code format stays "TRXV6:" for full back-compat.
    ════════════════════════════════════════════════════════════════════ */
-import {DAYS, BGOAL} from './data.js';
+import {DAYS, BGOAL, PROGRAM} from './data.js';
 import {state} from './state.js';
 import {store, replaceStore, persist, storageAvailable, flags, setLastBackup, daysSinceBackup} from './storage.js';
 import {weekDates} from './week.js';
-import {liftWeek, workWeight, recommend} from './progression.js';
-import {nutWeek} from './nutrition.js';
+import {liftWeek, workWeight} from './progression.js';
 import {bodyLatest} from './body.js';
 import {customList, isSkipped, customLiftWeek} from './custom.js';
-import {buildFindings} from './ui-dashboard.js';
 import {renderAll} from './ui-core.js';
 
 export function openModal(){
   const liftWeeks=Object.keys(store.lifts).length;
-  const nutDays=Object.values(store.nutrition).reduce((a,w)=>a+Object.keys(w).length,0);
   // live storage check — data is safe if EITHER durable store works
   const lsOK=storageAvailable()&&!flags.lastSaveFailed;
   const anyOK=lsOK||flags.idbOK;
@@ -38,7 +35,6 @@ export function openModal(){
     <div class="srow"><span>Saved to</span><span>${savedTo}</span></div>
     <div class="srow"><span>Last save code</span><span style="color:${backupColor};font-weight:600">${backupText}</span></div>
     <div class="srow"><span>Weeks of lifts</span><span>${liftWeeks}</span></div>
-    <div class="srow"><span>Days of food logged</span><span>${nutDays}</span></div>
     <div class="srow"><span>Body readings</span><span>${store.body.length}</span></div>
     <div class="srow"><span>Viewing</span><span>${weekDates(state.wo)}</span></div>
     ${overdue?`<div style="margin-top:12px;padding:11px 13px;background:var(--warn-soft);color:var(--warn);border-radius:10px;font-size:12.5px;font-weight:600;line-height:1.4">💾 Time to back up. Tap “Copy save code” below and paste it somewhere safe (Notes, or email it to yourself).</div>`:''}`;
@@ -59,33 +55,23 @@ export function restoreData(){
     persist();renderAll();document.getElementById('importBox').value='';showCfm('cfmRestore');
   }catch(e){alert('Invalid save code.');}
 }
-export function clearData(){if(confirm('Clear ALL data — lifts, food, and body readings? This cannot be undone.')){replaceStore({});persist();renderAll();closeModal();}}
+export function clearData(){if(confirm('Clear ALL data — lifts and body readings? This cannot be undone.')){replaceStore({});persist();renderAll();closeModal();}}
 
 export function copySummary(){
-  const nw=nutWeek(state.wo);
-  let out=`=== TRAINING RX v6 — WEEK SUMMARY ===\n${weekDates(state.wo)}\n`;
-  out+=`Goal: visual leanness by Aug 13 · target ${BGOAL.wLo}–${BGOAL.wHi} lb\n\n`;
-  // findings
-  out+=`-- FINDINGS --\n`;
-  buildFindings(nw).forEach(f=>{out+=`  ${f.text.replace(/<[^>]+>/g,'')}\n`;});
-  // nutrition
-  if(nw){const a=nw.avg;out+=`\n-- NUTRITION (avg of ${nw.n} days) --\n  Calories ${Math.round(a.cal)} (t 1800-1900)\n  Protein ${Math.round(a.pro)}g (t 180-200)\n  Carbs ${Math.round(a.carb)}g (t 100-130)\n  Fat ${Math.round(a.fat)}g (t <60)\n`;}
-  // lifts
-  out+=`\n-- LIFTS & NEXT TARGETS --\n`;
+  let out=`=== TRAINING RX — WEEK SUMMARY ===\n${weekDates(state.wo)}\n`;
+  out+=`Cruise Cut · goal ${BGOAL.wLo}–${BGOAL.wHi} lb by ${PROGRAM.endLabel}\n\n`;
+  // lifts — actual logged sets only, no projected weights
+  out+=`-- LIFTS LOGGED --\n`;
   DAYS.forEach(day=>{
     let printed=false;
     const head=()=>{if(!printed){out+=`  [${day.name}]\n`;printed=true;}};
     day.exercises.forEach((ex,ei)=>{
-      if(isSkipped(state.wo,day.id,ei)){
-        return;
-      }
+      if(isSkipped(state.wo,day.id,ei))return;
       const sets=liftWeek(day.id,ei,state.wo);if(!sets.length)return;
       head();
-      const rec=recommend(ex,day.id,ei,state.wo);
       const ws=ex.bw?(workWeight(day.id,ei,state.wo)>0?`+${workWeight(day.id,ei,state.wo)}`:'BW'):`${workWeight(day.id,ei,state.wo)}lb`;
       const reps=sets.map(s=>s.reps).join(',');
-      let nx=rec.status==='up'?(ex.bw?`→ ${ex.topRep+1}+ reps`:`→ ${rec.nextWeight}lb`):rec.status==='deload'?'→ DELOAD':'→ hold';
-      out+=`    ${ex.name}: ${ws} x[${reps}] ${nx} (${rec.note})\n`;
+      out+=`    ${ex.name}: ${ws} x[${reps}]\n`;
     });
     customList(state.wo,day.id).forEach(cx=>{
       const sets=customLiftWeek(day.id,cx.id,state.wo);if(!sets.length)return;

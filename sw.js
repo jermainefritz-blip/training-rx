@@ -10,7 +10,7 @@
 
    All paths are RELATIVE so this works under any GitHub Pages sub-path.
    ════════════════════════════════════════════════════════════════════ */
-const CACHE_VERSION = 'trx-v9-2026-07-05';   // ← bump on every deploy to ship updates
+const CACHE_VERSION = 'trx-v10-2026-09-07';   // ← bump on every deploy to ship updates
 const CACHE = CACHE_VERSION;
 
 /* The app shell — everything needed to boot with no network. */
@@ -28,16 +28,12 @@ const SHELL = [
   './js/data.js',
   './js/util.js',
   './js/progression.js',
-  './js/nutrition.js',
   './js/body.js',
   './js/custom.js',
-  './js/activity.js',
   './js/timer.js',
   './js/fx.js',
   './js/ui-workout.js',
   './js/ui-dashboard.js',
-  './js/ui-activity.js',
-  './js/ui-insights.js',
   './js/ui-core.js',
   './js/ui-export.js'
 ];

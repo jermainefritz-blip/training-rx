@@ -2,14 +2,13 @@
    ui-core.js — primary tabs, navigation, week bar, and the top-level
    renderAll() that refreshes everything for the current week.
    ════════════════════════════════════════════════════════════════════ */
-import {TABS, SUBS} from './data.js';
+import {TABS} from './data.js';
 import {state} from './state.js';
 import {weekDates} from './week.js';
 import {renderWorkout} from './ui-workout.js';
 import {renderDash} from './ui-dashboard.js';
-import {renderInsights} from './ui-insights.js';
 
-/* build the two primary tab buttons (Train / Dashboard) */
+/* build the two primary tab buttons (Train / Body) */
 export function buildTabs(){
   const tabsEl=document.getElementById('tabs');
   TABS.forEach(t=>{
@@ -27,18 +26,11 @@ export function switchTab(id){
   TABS.forEach(t=>{const p=document.getElementById('panel-'+t.id);if(p)p.classList.toggle('active',t.id===id);});
   document.getElementById('tbar').classList.toggle('hide',id!=='workout'); // rest timer only on Train
   if(id==='dash')renderDash();
-  else if(id==='insights')renderInsights();
 }
 export function switchDay(i){
   state.activeDay=i;
   document.querySelectorAll('.subtab[id^="wsub-"]').forEach((t,idx)=>t.classList.toggle('active',idx===i));
   document.querySelectorAll('#workoutDays .subpanel').forEach((p,idx)=>p.classList.toggle('active',idx===i));
-}
-export function switchSub(id){
-  state.activeSub=id;
-  SUBS.forEach(s=>document.getElementById('dsub-'+s.id).classList.toggle('active',s.id===id));
-  document.querySelectorAll('#panel-dash .subpanel').forEach(p=>p.classList.toggle('active',p.id==='sub-'+id));
-  renderDash();
 }
 export function changeWeek(dir){
   if(state.wo+dir>0)return;
@@ -58,5 +50,4 @@ export function renderAll(){
   renderWeekBar();
   renderWorkout();
   if(state.activeTab==='dash')renderDash();
-  else if(state.activeTab==='insights')renderInsights();
 }

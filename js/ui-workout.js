@@ -6,7 +6,7 @@ import {DAYS} from './data.js';
 import {state} from './state.js';
 import {store, persist} from './storage.js';
 import {wKey, weekDates} from './week.js';
-import {liftWeek, workWeight, recommend, targetWeight} from './progression.js';
+import {liftWeek, workWeight, lastWeight} from './progression.js';
 import {customList, customAdd, customDel, isSkipped, customLiftWeek} from './custom.js';
 import {setTimer, startTimer} from './timer.js';
 import {confetti} from './fx.js';
@@ -24,8 +24,8 @@ function plates(total,bar){
 }
 
 /* ── QUICK WIN 1: open on today's session ───────────────────────────── */
-const DOW_TO_DAY={1:0,3:1,4:2,6:3}; // Mon→Push, Wed→Pull, Thu→Legs, Sat→Upper
-const REST_NEXT={2:1,5:3,0:0};      // rest days → next session: Tue→Pull, Fri→Upper, Sun→Push
+const DOW_TO_DAY={1:0,2:1,4:2,5:3}; // Mon→Push, Tue→Pull, Thu→Legs, Fri→Upper
+const REST_NEXT={3:2,6:0,0:0};      // rest/HIIT days → next session: Wed→Legs, Sat→Push, Sun→Push
 function todaySession(){
   const wd=new Date().getDay();
   if(wd in DOW_TO_DAY)return {idx:DOW_TO_DAY[wd],today:true};
@@ -109,8 +109,6 @@ export function buildWorkoutPanel(){
         <div class="day-sub">${day.subtitle}</div>
         <div class="day-meta">
           <span class="mpill ac">${day.exercises.length} lifts</span>
-          <span class="mpill">${day.finisher.name}</span>
-          ${day.extra?`<span class="mpill">${day.extra.name}</span>`:''}
         </div>
       </div>
       <div class="done-banner" id="banner-${di}"><h3>Session complete</h3><p>Log it silently — recap comes Sunday.</p></div>`;
@@ -122,7 +120,6 @@ export function buildWorkoutPanel(){
       const card=document.createElement('div');
       card.className='excard';card.id=`ex-${di}-${ei}`;
       card.innerHTML=`
-        <div class="bump-flag" id="bump-${di}-${ei}"></div>
         <div class="exhdr">
           <div class="exname">${ex.name}</div>
           <div class="excheck" id="chk-${di}-${ei}">✓</div>
@@ -135,7 +132,7 @@ export function buildWorkoutPanel(){
         </div>
         <div class="ref-row">
           <div class="ref-pill"><div class="ref-label">Last session</div><div class="ref-val" id="ref-last-${di}-${ei}">—</div></div>
-          <div class="ref-pill"><div class="ref-label">Target this week</div><div class="ref-val target" id="ref-tgt-${di}-${ei}">—</div></div>
+          <div class="ref-pill"><div class="ref-label">Use this weight</div><div class="ref-val target" id="ref-tgt-${di}-${ei}">—</div></div>
         </div>
         <div class="plate-line" id="plate-${di}-${ei}" style="display:none"></div>
         <button class="repeat-btn" id="rep-${di}-${ei}" onclick="repeatLastWeek(${di},${ei})" style="display:none">↩ Same as last week</button>
@@ -155,12 +152,6 @@ export function buildWorkoutPanel(){
       <button class="add-ex-btn" id="addbtn-${di}" onclick="openAddForm(${di})">+ Add exercise</button>
       <div class="add-form" id="addform-${di}"></div>`);
 
-    // finisher card
-    const f=day.finisher;
-    const blue=(f.type==='cycle'||f.type==='pilates');
-    let fin=`<div class="cardio-card${blue?' blue':''}"><div class="ci">${f.icon}</div><div><div class="cn">${f.name}</div><div class="cd">${f.desc}</div></div></div>`;
-    if(day.extra)fin+=`<div class="cardio-card"><div class="ci">${day.extra.icon}</div><div><div class="cd">${day.extra.desc}</div></div></div>`;
-    sp.insertAdjacentHTML('beforeend',fin);
     wd.appendChild(sp);
   });
 }
@@ -178,24 +169,13 @@ export function renderWorkout(){
       card.classList.remove('skipped');
       const oldNote=document.getElementById(`skip-${di}-${ei}`);if(oldNote)oldNote.remove();
 
-      // reference pills
+      // reference pills — both pulled straight from history, never bumped
       const lastW=workWeight(day.id,ei,state.wo-1);
       document.getElementById(`ref-last-${di}-${ei}`).textContent =
         lastW!=null?(ex.bw?(lastW>0?`+${lastW}`:'BW'):`${lastW} lb`):(ex.bw?'BW':'—');
-      const tgt=targetWeight(ex,day.id,ei,state.wo);
+      const tgt=lastWeight(day.id,ei,state.wo)??ex.start;
       document.getElementById(`ref-tgt-${di}-${ei}`).textContent =
-        ex.bw?(tgt>0?`+${tgt} · ${ex.topRep}+`:`BW · ${ex.topRep}+`):`${tgt} lb`;
-
-      // bump flag: did target rise vs last logged working weight?
-      const bf=document.getElementById(`bump-${di}-${ei}`);
-      if(isNow&&!skipped&&lastW!=null&&!ex.bw&&tgt>lastW){
-        bf.textContent=`↑ Progressed: target ${tgt} lb (was ${lastW}). Earned by hitting top reps.`;
-        bf.classList.add('show');
-      }else if(isNow&&!skipped&&ex.bw&&lastW!=null){
-        const recPrev=recommend(ex,day.id,ei,state.wo-1);
-        if(recPrev.status==='up'){bf.textContent=`↑ Progressed: aim ${ex.topRep+1}+ reps or add load this week.`;bf.classList.add('show');}
-        else bf.classList.remove('show');
-      }else bf.classList.remove('show');
+        ex.bw?(tgt>0?`+${tgt}`:'BW'):`${tgt} lb`;
 
       // quick-win controls: "same as last week" + plate calculator
       const repBtn=document.getElementById(`rep-${di}-${ei}`);
@@ -328,7 +308,7 @@ export function openAddForm(di){
     <div class="af-field"><label>Exercise name</label><input type="text" id="af-name-${di}" placeholder="e.g. DB Floor Press" maxlength="40"></div>
     <div class="af-row">
       <div class="af-field"><label>Type</label>
-        <select id="af-type-${di}"><option value="isolation">Isolation (1 wk → +load)</option><option value="strength">Compound (2 wks → +load)</option></select>
+        <select id="af-type-${di}"><option value="isolation">Isolation (higher reps)</option><option value="strength">Compound (lower reps, heavier)</option></select>
       </div>
       <div class="af-field"><label>Sets</label><input type="number" inputmode="numeric" id="af-sets-${di}" value="3" min="1" max="8"></div>
     </div>
@@ -355,7 +335,7 @@ export function saveCustomEx(di){
   const startV=document.getElementById(`af-start-${di}`).value;
   const replaces=document.getElementById(`af-repl-${di}`).value;
   const restSecs=type==='strength'?150:60;
-  customAdd(state.wo,day.id,{name,type,sets,topRep,restSecs,start:startV===''?null:+startV,replaces,inc:type==='strength'?5:2.5});
+  customAdd(state.wo,day.id,{name,type,sets,topRep,restSecs,start:startV===''?null:+startV,replaces});
   document.getElementById(`addform-${di}`).classList.remove('open');
   document.getElementById(`addform-${di}`).innerHTML='';
   renderWorkout();
