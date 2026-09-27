@@ -109,6 +109,7 @@ export function buildWorkoutPanel(){
         <div class="day-sub">${day.subtitle}</div>
         <div class="day-meta">
           <span class="mpill ac">${day.exercises.length} lifts</span>
+          ${day.note?`<span class="mpill">${day.note}</span>`:''}
         </div>
       </div>
       <div class="done-banner" id="banner-${di}"><h3>Session complete</h3><p>Log it silently — recap comes Sunday.</p></div>`;

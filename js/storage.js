@@ -19,7 +19,7 @@ const DB_NAME='trainingRx', DB_STORE='kv', DB_KEY='store';
 
 /* The one source of truth. Mutated in place (never reassigned) so every
    module that imports it keeps seeing the same live object. */
-export const store={lifts:{},body:[],applied:{},custom:{},skipped:{}};
+export const store={lifts:{},body:[],applied:{},custom:{},skipped:{},programVersion:0};
 
 /* Runtime flags other modules read (Data modal, boot warning). */
 export const flags={storageOK:true, lastSaveFailed:false, idbOK:false, migrated:false};
@@ -102,6 +102,29 @@ export function replaceStore(p){
   store.applied=p.applied||{};
   store.custom=p.custom||{};
   store.skipped=p.skipped||{};
+  store.programVersion=p.programVersion||0;
+}
+
+/* ── one-time migration: Program v10 reordered the Pull day, moving
+   Standing Barbell Shrug from slot 3 to slot 4. Without this, any
+   history already logged at the old slot would display under whatever
+   new exercise now sits there instead of following the same lift.
+   Gated on programVersion so it only ever runs once per browser. ── */
+function migrateToV10(){
+  if((store.programVersion||0)>=10)return;
+  Object.keys(store.lifts).forEach(wk=>{
+    const pull=store.lifts[wk]?.pull;
+    if(pull&&pull[3]!=null&&pull[4]==null){pull[4]=pull[3];delete pull[3];}
+  });
+  Object.keys(store.skipped).forEach(wk=>{
+    const arr=store.skipped[wk]?.pull;
+    if(arr)store.skipped[wk].pull=arr.map(i=>i===3?4:i);
+  });
+  Object.keys(store.custom).forEach(wk=>{
+    (store.custom[wk]?.pull||[]).forEach(c=>{if(+c.replaces===3)c.replaces='4';});
+  });
+  store.programVersion=10;
+  persist();
 }
 
 /* Load saved data at boot. Prefers IndexedDB, falls back to legacy
@@ -126,6 +149,8 @@ export async function loadAll(){
   }
   // if we loaded from IDB, refresh the localStorage mirror so both agree
   if(fromIdb){try{localStorage.setItem(LS_KEY,JSON.stringify(store));}catch(e){}}
+
+  migrateToV10();
 }
 
 /* ── Backup-freshness tracking (for the "last backed up N days ago" nudge) ── */

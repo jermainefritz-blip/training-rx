@@ -15,11 +15,12 @@
 export const DAYS=[
   {
     id:"push", label:"Push", name:"Push Day", subtitle:"Chest · Shoulders · Triceps",
+    note:"🦵 Hip Mobility · 15 min",
     exercises:[
-      {name:"Flat DB Bench Press", muscle:"Chest ★", setsReps:"4×4–6", sets:4, topRep:6, restSecs:150, type:"strength", start:60},
-      {name:"Seated DB Shoulder Press", muscle:"Front delts ★", setsReps:"3×6–8", sets:3, topRep:8, restSecs:105, type:"strength", start:40},
+      {name:"Barbell Bench Press", muscle:"Chest ★", setsReps:"4×4–6", sets:4, topRep:6, restSecs:150, type:"strength", start:155, bar:45},
+      {name:"Barbell Overhead Press", muscle:"Front delts ★", setsReps:"4×4–6", sets:4, topRep:6, restSecs:150, type:"strength", start:80, bar:45},
       {name:"High-to-Low Cable Fly", muscle:"Lower chest", setsReps:"3×10–15", sets:3, topRep:15, restSecs:75, type:"isolation", start:20},
-      {name:"Face-Away Cable Reverse Fly", muscle:"Rear delts", setsReps:"3×10–15", sets:3, topRep:15, restSecs:75, type:"isolation", start:15},
+      {name:"Bent-Over Reverse DB Fly", muscle:"Rear delts", setsReps:"3×10–15", sets:3, topRep:15, restSecs:75, type:"isolation", start:15},
       {name:"Cable Lateral Raise", muscle:"Lateral delts ★", setsReps:"4×10–15", sets:4, topRep:15, restSecs:75, type:"isolation", start:10},
       {name:"Cable Upright Row", muscle:"Traps · delts", setsReps:"3×10–15", sets:3, topRep:15, restSecs:75, type:"isolation", start:40},
     ]
@@ -28,11 +29,11 @@ export const DAYS=[
     id:"pull", label:"Pull", name:"Pull Day", subtitle:"Back · Rear Delts · Biceps",
     exercises:[
       {name:"Weighted Pull-Up", muscle:"Upper back ★", setsReps:"4×4–6", sets:4, topRep:6, restSecs:150, type:"strength", start:15, bw:true},
-      {name:"Chest-Supported DB Row", muscle:"Upper back ★", setsReps:"4×6–8", sets:4, topRep:8, restSecs:105, type:"strength", start:50},
-      {name:"Straight-Arm Lat Pulldown", muscle:"Lats", setsReps:"3×10–15", sets:3, topRep:15, restSecs:75, type:"isolation", start:50},
+      {name:"Chest-Supported DB Row (Overhand Grip)", muscle:"Upper back ★", setsReps:"4×6–8", sets:4, topRep:8, restSecs:105, type:"strength", start:50},
+      {name:"Meadows Row", muscle:"Upper back ★", setsReps:"3×8–10/side", sets:3, topRep:10, restSecs:75, type:"strength", start:35},
+      {name:"Standing Front Delt Lateral Raise", muscle:"Front delts", setsReps:"3×10–15", sets:3, topRep:15, restSecs:75, type:"isolation", start:15},
       {name:"Standing Barbell Shrug", muscle:"Traps ★", setsReps:"3×10–15", sets:3, topRep:15, restSecs:75, type:"isolation", start:135, bar:45},
-      {name:"Reverse Pec Deck", muscle:"Rear delts ★", setsReps:"3×10–15", sets:3, topRep:15, restSecs:75, type:"isolation", start:60},
-      {name:"Incline DB Curl", muscle:"Biceps", setsReps:"3×10–15", sets:3, topRep:15, restSecs:75, type:"isolation", start:25},
+      {name:"Hammer Curl", muscle:"Biceps", setsReps:"3×10–15", sets:3, topRep:15, restSecs:75, type:"isolation", start:25},
     ]
   },
   {
