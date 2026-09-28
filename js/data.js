@@ -30,8 +30,7 @@ export const DAYS=[
     exercises:[
       {name:"Weighted Pull-Up", muscle:"Upper back ★", setsReps:"4×4–6", sets:4, topRep:6, restSecs:150, type:"strength", start:15, bw:true},
       {name:"Chest-Supported DB Row (Overhand Grip)", muscle:"Upper back ★", setsReps:"4×6–8", sets:4, topRep:8, restSecs:105, type:"strength", start:50},
-      {name:"Meadows Row", muscle:"Upper back ★", setsReps:"3×8–10/side", sets:3, topRep:10, restSecs:75, type:"strength", start:35},
-      {name:"Standing Front Delt Lateral Raise", muscle:"Front delts", setsReps:"3×10–15", sets:3, topRep:15, restSecs:75, type:"isolation", start:15},
+      {name:"Kelso Shrug (DB, Chest-Supported on Incline Bench)", muscle:"Traps ★", setsReps:"3×10–15", sets:3, topRep:15, restSecs:75, type:"isolation", start:30},
       {name:"Standing Barbell Shrug", muscle:"Traps ★", setsReps:"3×10–15", sets:3, topRep:15, restSecs:75, type:"isolation", start:135, bar:45},
       {name:"Hammer Curl", muscle:"Biceps", setsReps:"3×10–15", sets:3, topRep:15, restSecs:75, type:"isolation", start:25},
     ]
@@ -51,8 +50,8 @@ export const DAYS=[
     exercises:[
       {name:"Vertical Traction Pulldown", muscle:"Upper back ★", setsReps:"4×6–8", sets:4, topRep:8, restSecs:150, type:"strength", start:145},
       {name:"Weighted Dips", muscle:"Chest · triceps ★", setsReps:"4×4–6", sets:4, topRep:6, restSecs:150, type:"strength", start:25, bw:true},
-      {name:"Incline Bench Face-Down Reverse Fly", muscle:"Rear delts", setsReps:"3×10–15", sets:3, topRep:15, restSecs:75, type:"isolation", start:15},
-      {name:"Lateral Raise Machine", muscle:"Lateral delts", setsReps:"3×10–15", sets:3, topRep:15, restSecs:75, type:"isolation", start:60},
+      {name:"Cable Rear-Delt Fly (Shoulder Height, Not Behind Torso)", muscle:"Rear delts", setsReps:"3×10–15", sets:3, topRep:15, restSecs:75, type:"isolation", start:15},
+      {name:"Lateral Raise Machine", muscle:"Lateral delts", setsReps:"4×10–15", sets:4, topRep:15, restSecs:75, type:"isolation", start:60},
       {name:"Cable Y-Raise", muscle:"Delts", setsReps:"3×10–15", sets:3, topRep:15, restSecs:75, type:"isolation", start:10},
       {name:"Overhead Triceps Extension", muscle:"Triceps (optional)", setsReps:"2×10–15", sets:2, topRep:15, restSecs:75, type:"isolation", start:32.5},
     ]

@@ -105,25 +105,41 @@ export function replaceStore(p){
   store.programVersion=p.programVersion||0;
 }
 
-/* ── one-time migration: Program v10 reordered the Pull day, moving
-   Standing Barbell Shrug from slot 3 to slot 4. Without this, any
-   history already logged at the old slot would display under whatever
-   new exercise now sits there instead of following the same lift.
-   Gated on programVersion so it only ever runs once per browser. ── */
-function migrateToV10(){
-  if((store.programVersion||0)>=10)return;
+/* Move a base exercise's logged history from one Pull-day slot to another
+   (lifts, skip flags, and any custom-exercise "replaces" pointer) — used
+   whenever a program update reorders a lift that already has history. */
+function remapPullSlot(from,to){
   Object.keys(store.lifts).forEach(wk=>{
     const pull=store.lifts[wk]?.pull;
-    if(pull&&pull[3]!=null&&pull[4]==null){pull[4]=pull[3];delete pull[3];}
+    if(pull&&pull[from]!=null&&pull[to]==null){pull[to]=pull[from];delete pull[from];}
   });
   Object.keys(store.skipped).forEach(wk=>{
     const arr=store.skipped[wk]?.pull;
-    if(arr)store.skipped[wk].pull=arr.map(i=>i===3?4:i);
+    if(arr)store.skipped[wk].pull=arr.map(i=>i===from?to:i);
   });
   Object.keys(store.custom).forEach(wk=>{
-    (store.custom[wk]?.pull||[]).forEach(c=>{if(+c.replaces===3)c.replaces='4';});
+    (store.custom[wk]?.pull||[]).forEach(c=>{if(+c.replaces===from)c.replaces=String(to);});
   });
+}
+
+/* ── one-time migrations, gated on an internal counter (not the "vN"
+   label shown in the app — several content fixes can land under one
+   public version). Each runs once per browser, in order. ── */
+function migrateToV10(){
+  if((store.programVersion||0)>=10)return;
+  // Program v10: Standing Barbell Shrug moved from Pull slot 3 to slot 4.
+  remapPullSlot(3,4);
   store.programVersion=10;
+  persist();
+}
+function migrateV10Fix1(){
+  if((store.programVersion||0)>=11)return;
+  // Program v10 correction: Meadows Row and Standing Front Delt Lateral
+  // Raise were removed from Pull, so Standing Barbell Shrug and Hammer
+  // Curl each shift back one slot (4→3, 5→4) to close the gap.
+  remapPullSlot(4,3);
+  remapPullSlot(5,4);
+  store.programVersion=11;
   persist();
 }
 
@@ -151,6 +167,7 @@ export async function loadAll(){
   if(fromIdb){try{localStorage.setItem(LS_KEY,JSON.stringify(store));}catch(e){}}
 
   migrateToV10();
+  migrateV10Fix1();
 }
 
 /* ── Backup-freshness tracking (for the "last backed up N days ago" nudge) ── */
