@@ -29,8 +29,8 @@ export const DAYS=[
     id:"pull", label:"Pull", name:"Pull Day", subtitle:"Back · Rear Delts · Biceps",
     exercises:[
       {name:"Weighted Pull-Up", muscle:"Upper back ★", setsReps:"4×4–6", sets:4, topRep:6, restSecs:150, type:"strength", start:15, bw:true},
-      {name:"Chest-Supported DB Row (Overhand Grip)", muscle:"Upper back ★", setsReps:"4×6–8", sets:4, topRep:8, restSecs:105, type:"strength", start:50},
-      {name:"Kelso Shrug (DB, Chest-Supported on Incline Bench)", muscle:"Traps ★", setsReps:"3×10–15", sets:3, topRep:15, restSecs:75, type:"isolation", start:30},
+      {name:"Single-Arm DB Row", muscle:"Upper back ★", setsReps:"4×6–8", sets:4, topRep:8, restSecs:105, type:"strength", start:50},
+      {name:"Lat Pulldown", muscle:"Lats", setsReps:"3×10–15", sets:3, topRep:15, restSecs:75, type:"isolation", start:50},
       {name:"Standing Barbell Shrug", muscle:"Traps ★", setsReps:"3×10–15", sets:3, topRep:15, restSecs:75, type:"isolation", start:135, bar:45},
       {name:"Hammer Curl", muscle:"Biceps", setsReps:"3×10–15", sets:3, topRep:15, restSecs:75, type:"isolation", start:25},
     ]
